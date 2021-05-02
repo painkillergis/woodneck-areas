@@ -1,4 +1,4 @@
-# woodneck-vectors
+# woodneck-areas
 
 ## Setup
 

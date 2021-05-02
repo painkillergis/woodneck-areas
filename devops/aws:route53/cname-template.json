@@ -1,10 +1,10 @@
 {
-  "Comment": "Create CNAME for woodneck-vectors.painkillergis.com",
+  "Comment": "Create CNAME for woodneck-areas.painkillergis.com",
   "Changes": [
     {
       "Action": "CREATE",
       "ResourceRecordSet": {
-        "Name": "woodneck-vectors.painkillergis.com",
+        "Name": "woodneck-areas.painkillergis.com",
         "Type": "CNAME",
         "TTL": 300,
         "ResourceRecords": [

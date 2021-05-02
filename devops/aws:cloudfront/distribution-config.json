@@ -1,15 +1,15 @@
 {
   "Aliases": {
     "Quantity": 1,
-    "Items": ["woodneck-vectors.painkillergis.com"]
+    "Items": ["woodneck-areas.painkillergis.com"]
   },
   "DefaultRootObject": "index.json",
   "Origins": {
     "Quantity": 1,
     "Items": [
       {
-        "Id": "woodneck-vectors.painkillergis.com.s3.amazonaws.com",
-        "DomainName": "woodneck-vectors.painkillergis.com.s3.amazonaws.com",
+        "Id": "woodneck-areas.painkillergis.com.s3.amazonaws.com",
+        "DomainName": "woodneck-areas.painkillergis.com.s3.amazonaws.com",
         "CustomOriginConfig": {
           "HTTPPort": 80,
           "HTTPSPort": 443,
@@ -21,7 +21,7 @@
     ]
   },
   "DefaultCacheBehavior": {
-    "TargetOriginId": "woodneck-vectors.painkillergis.com.s3.amazonaws.com",
+    "TargetOriginId": "woodneck-areas.painkillergis.com.s3.amazonaws.com",
     "ViewerProtocolPolicy": "redirect-to-https",
     "AllowedMethods": {
       "Quantity": 3,

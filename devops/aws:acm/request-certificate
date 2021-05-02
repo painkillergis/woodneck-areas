@@ -1,14 +1,16 @@
 #!/bin/zsh
 aws acm request-certificate \
-  --domain-name woodneck-vectors.painkillergis.com \
+  --domain-name woodneck-areas.painkillergis.com \
   --validation-method DNS | \
   jq .CertificateArn -r | tr -d '\n' > devops/aws:acm/certificate-arn
 
-resourceRecord=""
-while [ "$resourceRecord" = "" ] ; do
+resourceRecord="null"
+while [ "$resourceRecord" = "null" ] ; do
   description=$(aws acm describe-certificate --certificate-arn file://devops/aws:acm/certificate-arn)
   resourceRecord=$(echo $description | jq ".Certificate.DomainValidationOptions[].ResourceRecord")
 done
+
+echo resourceRecord $resourceRecord
 
 name=$(echo $resourceRecord | jq ".Name" -r)
 type=$(echo $resourceRecord | jq ".Type" -r)
