@@ -7,37 +7,37 @@ const crypto = require('crypto')
   (async function () {
     await fsPromises.mkdir('./build', { recursive: true })
 
-    const collections = await fsPromises.readdir('./collections')
+    const collections = await Promise.all(
+      (await fsPromises.readdir('./collections')).map(
+        async (collection) => {
+          const neighborhoodsSum = crypto.createHash('sha1')
+          const neighborhoodsSourceFileName = `collections/${collection}/neighborhoods.json`
 
-    const areas = await Promise.all(
-      collections.map(async (collection) => {
-        const neighborhoodsSum = crypto.createHash('sha1')
-        const neighborhoodsSourceFileName = `collections/${collection}/neighborhoods.json`
+          neighborhoodsSum.update(
+            await fsPromises.readFile(neighborhoodsSourceFileName),
+          )
 
-        neighborhoodsSum.update(
-          await fsPromises.readFile(neighborhoodsSourceFileName),
-        )
+          const neighborhoodsDestinationFileName = `${neighborhoodsSum.digest(
+            'hex',
+          )}.json`
 
-        const neighborhoodsDestinationFileName = `${neighborhoodsSum.digest(
-          'hex',
-        )}.json`
+          await fsPromises.copyFile(
+            neighborhoodsSourceFileName,
+            `build/${neighborhoodsDestinationFileName}`,
+          )
 
-        await fsPromises.copyFile(
-          neighborhoodsSourceFileName,
-          `build/${neighborhoodsDestinationFileName}`,
-        )
+          const { displayName } = await fsPromises
+            .readFile(`collections/${collection}/index.json`)
+            .then((response) => JSON.parse(response))
 
-        const { displayName } = await fsPromises
-          .readFile(`collections/${collection}/index.json`)
-          .then((response) => JSON.parse(response))
-
-        return {
-          displayName,
-          name: collection,
-          neighborhoods: neighborhoodsDestinationFileName,
-        }
-      }),
+          return {
+            displayName,
+            name: collection,
+            neighborhoods: neighborhoodsDestinationFileName,
+          }
+        },
+      ),
     )
 
-    fs.writeFileSync('build/v1.json', JSON.stringify({ areas }))
+    fs.writeFileSync('build/v2.json', JSON.stringify({ collections }))
   })()
