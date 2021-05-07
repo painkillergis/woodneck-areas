@@ -1,4 +1,4 @@
 #!/bin/zsh
 aws cloudfront create-invalidation \
   --distribution-id file://devops/aws:cloudfront/distribution-id \
-  --invalidation-batch "Paths={Quantity=1,Items=["/v1/index.json"]},CallerReference=`uuidgen`"
+  --invalidation-batch "Paths={Quantity=1,Items=["/v1.json"]},CallerReference=`uuidgen`"

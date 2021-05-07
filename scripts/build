@@ -5,19 +5,18 @@ const crypto = require('crypto')
 
 0 ||
   (async function () {
+    await fsPromises.mkdir('./build', { recursive: true })
+
     const collections = await fsPromises.readdir('./collections')
 
     const areas = await Promise.all(
       collections.map(async (collection) => {
         const neighborhoodsSum = crypto.createHash('sha1')
-        neighborhoodsSourceFileName = `collections/${collection}/neighborhoods.json`
+        const neighborhoodsSourceFileName = `collections/${collection}/neighborhoods.json`
 
-        await new Promise((resolve, reject) => {
-          const stream = fs.ReadStream(neighborhoodsSourceFileName)
-          stream.on('data', (data) => neighborhoodsSum.update(data))
-          stream.on('end', resolve)
-          stream.on('error', reject)
-        })
+        neighborhoodsSum.update(
+          await fsPromises.readFile(neighborhoodsSourceFileName),
+        )
 
         const neighborhoodsDestinationFileName = `${neighborhoodsSum.digest(
           'hex',
@@ -40,9 +39,5 @@ const crypto = require('crypto')
       }),
     )
 
-    fs.mkdir('./build/v1', { recursive: true }, (error) => {
-      if (error) console.error(error)
-      else
-        fs.writeFileSync('build/v1/index.json', JSON.stringify({ areas }))
-    })
+    fs.writeFileSync('build/v1.json', JSON.stringify({ areas }))
   })()
