@@ -10,20 +10,35 @@ const crypto = require('crypto')
     const collections = await Promise.all(
       (await fsPromises.readdir('./collections')).map(
         async (collection) => {
-          const neighborhoodsSum = crypto.createHash('sha1')
-          const neighborhoodsSourceFileName = `collections/${collection}/neighborhoods.json`
+          const attachments = (
+            await Promise.all(
+              (await fsPromises.readdir(`./collections/${collection}`))
+                .filter((attachment) => attachment !== 'index.json')
+                .map((attachment) =>
+                  attachment.substring(0, attachment.lastIndexOf('.')),
+                )
+                .map(async (attachment) => {
+                  const sum = crypto.createHash('sha1')
+                  const sourcePath = `collections/${collection}/${attachment}.json`
 
-          neighborhoodsSum.update(
-            await fsPromises.readFile(neighborhoodsSourceFileName),
-          )
+                  sum.update(await fsPromises.readFile(sourcePath))
 
-          const neighborhoodsDestinationFileName = `${neighborhoodsSum.digest(
-            'hex',
-          )}.json`
+                  const destinationFileName = `${sum.digest('hex')}.json`
 
-          await fsPromises.copyFile(
-            neighborhoodsSourceFileName,
-            `build/${neighborhoodsDestinationFileName}`,
+                  await fsPromises.copyFile(
+                    sourcePath,
+                    `build/${destinationFileName}`,
+                  )
+
+                  return [attachment, destinationFileName]
+                }),
+            )
+          ).reduce(
+            (attachments, [attachment, destinationFileName]) => ({
+              ...attachments,
+              [[attachment]]: destinationFileName,
+            }),
+            {},
           )
 
           const { displayName } = await fsPromises
@@ -31,9 +46,9 @@ const crypto = require('crypto')
             .then((response) => JSON.parse(response))
 
           return {
+            ...attachments,
             displayName,
             name: collection,
-            neighborhoods: neighborhoodsDestinationFileName,
           }
         },
       ),
