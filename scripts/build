@@ -1,0 +1,48 @@
+#!/usr/bin/env node
+const fs = require('fs')
+const fsPromises = require('fs/promises')
+const crypto = require('crypto')
+
+0 ||
+  (async function () {
+    const collections = await fsPromises.readdir('./collections')
+
+    const areas = await Promise.all(
+      collections.map(async (collection) => {
+        const neighborhoodsSum = crypto.createHash('sha1')
+        neighborhoodsSourceFileName = `collections/${collection}/neighborhoods.json`
+
+        await new Promise((resolve, reject) => {
+          const stream = fs.ReadStream(neighborhoodsSourceFileName)
+          stream.on('data', (data) => neighborhoodsSum.update(data))
+          stream.on('end', resolve)
+          stream.on('error', reject)
+        })
+
+        const neighborhoodsDestinationFileName = `${neighborhoodsSum.digest(
+          'hex',
+        )}.json`
+
+        await fsPromises.copyFile(
+          neighborhoodsSourceFileName,
+          `build/${neighborhoodsDestinationFileName}`,
+        )
+
+        const { displayName } = await fsPromises
+          .readFile(`collections/${collection}/index.json`)
+          .then((response) => JSON.parse(response))
+
+        return {
+          displayName,
+          name: collection,
+          neighborhoods: neighborhoodsDestinationFileName,
+        }
+      }),
+    )
+
+    fs.mkdir('./build/v1', { recursive: true }, (error) => {
+      if (error) console.error(error)
+      else
+        fs.writeFileSync('build/v1/index.json', JSON.stringify({ areas }))
+    })
+  })()

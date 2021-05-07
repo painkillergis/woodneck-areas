@@ -1,0 +1,13 @@
+{
+  "name": "woodneck-areas",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:painkillergis/woodneck-areas.git",
+  "author": "tyler <tyler@cruftbusters.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "scripts/build",
+    "sync": "aws s3 sync build/ s3://woodneck-areas.painkillergis.com/",
+    "invalidate": "devops/aws:cloudfront/invalidate"
+  }
+}
