@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "build": "scripts/build",
-    "sync": "aws s3 sync build/ s3://woodneck-areas.painkillergis.com/",
+    "sync": "aws s3 sync build/ s3://woodneck-areas.painkillergis.com/ --cache-control max-age=86400",
     "invalidate": "devops/aws:cloudfront/invalidate"
   }
 }
