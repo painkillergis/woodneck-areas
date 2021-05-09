@@ -2,6 +2,7 @@
 const fs = require('fs')
 const fsPromises = require('fs/promises')
 const crypto = require('crypto')
+const compress = require('brotli/compress')
 
 0 ||
   (async function () {
@@ -23,15 +24,18 @@ const crypto = require('crypto')
                 const sum = crypto.createHash('sha1')
                 const sourcePath = `collections/${collection}/layers/${layer}.json`
 
-                sum.update(await fsPromises.readFile(sourcePath))
-
-                const destinationFileName = `/${sum.digest('hex')}.json`
-
-                await fsPromises.copyFile(
-                  sourcePath,
-                  `build${destinationFileName}`,
+                const compressed = compress(
+                  await fsPromises.readFile(sourcePath),
                 )
 
+                sum.update(compressed)
+
+                const destinationFileName = `/${sum.digest('hex')}.br.json`
+
+                await fsPromises.writeFile(
+                  `build${destinationFileName}`,
+                  compressed,
+                )
                 return { layerName: layer, path: destinationFileName }
               }),
           )
@@ -48,6 +52,8 @@ const crypto = require('crypto')
         },
       ),
     )
-
-    fs.writeFileSync('build/v3.json', JSON.stringify({ collections }))
+    await fsPromises.writeFile(
+      'build/v4.br.json',
+      compress(Buffer.from(JSON.stringify({ collections }))),
+    )
   })()
